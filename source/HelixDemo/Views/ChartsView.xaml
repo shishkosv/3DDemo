@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="Oiler.Views.ChartsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Oiler.Views"
+             xmlns:chartControls="clr-namespace:Oiler.ChartControls;assembly=Oiler.ChartControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" HorizontalAlignment="Center">
+            <TextBlock Text="Select City : " Height="25"></TextBlock>
+            <ComboBox Width="200" Height="25" ItemsSource="{Binding Path=CitiesCollection}"
+                      SelectedIndex="0" SelectionChanged="Selector_OnSelectionChanged" />    
+        </DockPanel>
+        <chartControls:LineChart Height="Auto" 
+                                 x:Name="LineChart" Margin="0,20,0,0" 
+                                 ValuePath="Value" LabelPath="DateTimeMarker" Grid.Row="1" 
+                                 ItemsSource="{Binding Path=HistoryCollection}" />
+
+        <chartControls:PieChart 
+            x:Name="PieChart" Grid.Row="2" Margin="20" 
+            ItemsSource="{Binding Path=GroupHistoryCollection}" 
+            ValuePath="Counts" LabelPath="Temperature"  Title="Percentage of temperature" />
+
+
+    </Grid>
+</UserControl>

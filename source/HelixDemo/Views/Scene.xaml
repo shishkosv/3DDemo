@@ -1,0 +1,323 @@
+﻿<UserControl x:Class="Oiler.Views.Scene"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:h="http://helix-toolkit.org/wpf"
+             xmlns:visualModels="clr-namespace:Oiler._3D.VisualModels;assembly=Oiler.3D"
+             xmlns:converters="clr-namespace:Oiler._3D.Converters;assembly=Oiler.3D"
+             xmlns:extenssions="clr-namespace:Oiler._3D.Extenssions;assembly=Oiler.3D"
+             xmlns:pt="http://propertytools.org/wpf"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=System"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <ImageBrush x:Key="SmokeBrush" ImageSource="/Oiler.3D;Component/images/smoke.png"/>
+        <ImageBrush x:Key="FenceBrush" ImageSource="/Oiler.3D;Component/images/fence.png" ViewportUnits="Absolute" TileMode="Tile"/>
+        <DrawingBrush x:Key="KerbBrush" ViewportUnits="Absolute" TileMode="Tile">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="Black">
+                        <GeometryDrawing.Geometry>
+                            <GeometryGroup>
+                                <RectangleGeometry Rect="0,0,1,1" />
+                            </GeometryGroup>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="Yellow">
+                        <GeometryDrawing.Geometry>
+                            <GeometryGroup>
+                                <RectangleGeometry Rect="0,0,0.5,1" />
+                            </GeometryGroup>
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+        <converters:BoundsConverter x:Key="BoundsConverter"></converters:BoundsConverter>
+        <Point3DCollection x:Key="FencePositions">
+            <Point3D X="-22" Y="78" Z="0"/>
+            <Point3D X="72" Y="78" Z="0"/>
+            <Point3D X="72" Y="172" Z="0"/>
+            <Point3D X="-22" Y="172" Z="0"/>
+            <Point3D X="-22" Y="78" Z="0"/>
+        </Point3DCollection>
+        <LinearGradientBrush x:Key="RainbowBrush" StartPoint="0,0" EndPoint="1,0">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Color="Red" Offset="0"/>
+                <GradientStop Color="Orange" Offset="0.17"/>
+                <GradientStop Color="Yellow" Offset="0.33"/>
+                <GradientStop Color="Green" Offset="0.5"/>
+                <GradientStop Color="Blue" Offset="0.67"/>
+                <GradientStop Color="Indigo" Offset="0.84"/>
+                <GradientStop Color="Violet" Offset="1"/>
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+    </UserControl.Resources>
+    <Grid ShowGridLines="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Row="0" Grid.ColumnSpan="3">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." Command="{Binding FileOpenCommand}"/>
+                <MenuItem Header="_Export..." Command="{Binding FileExportCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding FileExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="View">
+                <MenuItem IsCheckable="True" Header="ShowCoordinateSystem" IsChecked="{Binding ShowCoordinateSystem, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ShowViewCube" IsChecked="{Binding ShowViewCube, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ShowCameraInfo" IsChecked="{Binding ShowCameraInfo, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ShowTriangleCountInfo" IsChecked="{Binding ShowTriangleCountInfo, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ShowFieldOfView" IsChecked="{Binding ShowFieldOfView, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ShowFrameRate" IsChecked="{Binding ShowFrameRate, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ShowCameraTarget" IsChecked="{Binding ShowCameraTarget, ElementName=view1}"/>
+                <MenuItem Header="Title">
+                    <TextBox Text="{Binding Title, ElementName=view1}" Width="200"/>
+                </MenuItem>
+                <MenuItem Header="SubTitle">
+                    <TextBox Text="{Binding SubTitle, ElementName=view1}" Width="200"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Camera">
+                <MenuItem IsCheckable="True" Header="Orthographic" IsChecked="{Binding Orthographic, ElementName=view1}"/>
+                <MenuItem Header="NearPlaneDistance">
+                    <TextBox Text="{Binding Camera.NearPlaneDistance, ElementName=view1}"></TextBox>
+                </MenuItem>
+                <MenuItem Header="FarPlaneDistance">
+                    <TextBox Text="{Binding Camera.FarPlaneDistance, ElementName=view1}"></TextBox>
+                </MenuItem>
+                <MenuItem IsCheckable="True" Header="RotateAroundMouseDownPoint" IsChecked="{Binding RotateAroundMouseDownPoint, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="ZoomAroundMouseDownPoint" IsChecked="{Binding ZoomAroundMouseDownPoint, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="InfiniteSpin" IsChecked="{Binding InfiniteSpin, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="IsInertiaEnabled" IsChecked="{Binding IsInertiaEnabled, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="IsPanEnabled" IsChecked="{Binding IsPanEnabled, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="IsMoveEnabled" IsChecked="{Binding IsMoveEnabled, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="IsRotationEnabled" IsChecked="{Binding IsRotationEnabled, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="IsZoomEnabled" IsChecked="{Binding IsZoomEnabled, ElementName=view1}"/>
+                <MenuItem IsCheckable="True" Header="IsChangeFovEnabled" IsChecked="{Binding IsChangeFieldOfViewEnabled, ElementName=view1}"/>
+                <MenuItem Header="RotationSensitivity">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Value="{Binding RotationSensitivity, ElementName=view1}" Minimum="0.1" Maximum="5" Width="200"/>
+                        <TextBlock Text="{Binding RotationSensitivity, StringFormat='{}{0:0.0}', ElementName=view1}"/>
+                    </StackPanel>
+                </MenuItem>
+                <MenuItem Header="ZoomSensitivity">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Value="{Binding ZoomSensitivity, ElementName=view1}" Minimum="0.1" Maximum="5" Width="200"/>
+                        <TextBlock Text="{Binding ZoomSensitivity, StringFormat='{}{0:0.0}', ElementName=view1}"/>
+                    </StackPanel>
+                </MenuItem>
+                <MenuItem Header="CameraInertiaFactor">
+                    <StackPanel Orientation="Horizontal">
+                        <Slider Value="{Binding CameraInertiaFactor, ElementName=view1}" Minimum="0.7" Maximum="1" Width="200"/>
+                        <TextBlock Text="{Binding CameraInertiaFactor, StringFormat='{}{0:0.000}', ElementName=view1}"/>
+                    </StackPanel>
+                </MenuItem>
+            </MenuItem>
+            <pt:EnumMenuItem SelectedValue="{Binding CameraRotationMode, ElementName=view1}" Header="CameraRotationMode"/>
+            <pt:EnumMenuItem SelectedValue="{Binding CameraMode, ElementName=view1}" Header="CameraMode"/>
+        </Menu>
+
+        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+            <StatusBarItem>
+                <TextBlock Text="{Binding Objects.Count, StringFormat='{}{0} objects'}"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <StatusBar Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
+            <StatusBarItem>
+                <DockPanel>
+                    <DockPanel>
+                        <TextBlock Text="Cursor Position" Margin="5,0,4,0"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="x" Margin="5,0,4,0"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" BorderThickness="0" TextAlignment="Right"
+                                 Text="{Binding Path=CursorPosition.X, ElementName=view1, StringFormat={}{0:f1}, FallbackValue=0.0}" />
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="y" Margin="5,0,4,0" />
+                        <TextBox Grid.Row="1" Grid.Column="1" BorderThickness="0" TextAlignment="Right"
+                                 Text="{Binding Path=CursorPosition.Y, ElementName=view1, StringFormat={}{0:f1}, FallbackValue=0.0}" />
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="z" Margin="5,0,4,0" />
+                        <TextBox Grid.Row="2" Grid.Column="1" BorderThickness="0" TextAlignment="Right"
+                                 Text="{Binding Path=CursorPosition.Z, ElementName=view1, StringFormat={}{0:f1}, FallbackValue=0.0}" />
+                    </DockPanel>
+
+                    <DockPanel>
+                        <TextBlock Text="Cursor position on element :" Margin="5,0,4,0"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="x" Margin="5,0,4,0"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" BorderThickness="0" TextAlignment="Right" Background="{Binding Path=Background, RelativeSource={RelativeSource TemplatedParent}}"
+                                 Text="{Binding Path=CursorOnElementPosition.X, ElementName=view1, StringFormat={}{0:f1}, FallbackValue=---}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="y" Margin="5,0,4,0" />
+                        <TextBox Grid.Row="1" Grid.Column="1" BorderThickness="0" TextAlignment="Right" Background="{Binding Path=Background, RelativeSource={RelativeSource TemplatedParent}}"
+                                 Text="{Binding Path=CursorOnElementPosition.Y, ElementName=view1, StringFormat={}{0:f1}, FallbackValue=---}" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="z" Margin="5,0,4,0" />
+                        <TextBox Grid.Row="2" Grid.Column="1" BorderThickness="0" TextAlignment="Right" Background="{Binding Path=Background, RelativeSource={RelativeSource TemplatedParent}}"
+                                 Text="{Binding Path=CursorOnElementPosition.Z, ElementName=view1, StringFormat={}{0:f1}, FallbackValue=---}" />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" Text="OnElement" Background="BlanchedAlmond"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center" Text="Position" Background="BlanchedAlmond"/>
+
+                    </DockPanel>
+                </DockPanel>
+                
+            </StatusBarItem>
+        </StatusBar>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" >
+            <TextBlock Text="Select Type : "></TextBlock>
+            <ComboBox x:Name="ModelsBox" Width="150" SelectedIndex="0" 
+                      ItemsSource="{Binding VisualModels}"></ComboBox>
+
+            <Button Content="Add Object" Width="150" Click="ButtonBase_OnClick"></Button>
+            <TextBlock Text="Object graph"></TextBlock>
+            <ListBox Width="Auto" ItemsSource="{Binding ElementName=MainModel, Path=Children}" 
+                     BorderThickness="0" Padding="2"
+                     SelectionChanged="Selector_OnSelectionChanged" >
+            <ListBox.Resources>
+
+                    <DataTemplate DataType="{x:Type visualModels:KerbVisual3D}">
+                        <StackPanel Background="Olive">
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type visualModels:FenceVisual3D}">
+                        <StackPanel Background="Silver">
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type visualModels:WellVisual3D}">
+                        <StackPanel Background="BlueViolet">
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type visualModels:SiloVisual3D}">
+                        <StackPanel Background="Brown">
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type visualModels:ChimneyVisual3D}">
+                        <StackPanel Background="Red">
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type visualModels:HouseVisual3D}">
+                        <StackPanel Background="Green">
+                            <TextBlock Text="{Binding Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.Resources>
+
+            </ListBox>
+        </StackPanel>
+
+        <h:HelixViewport3D x:Name="view1" Grid.Row="1" Grid.Column="1" MouseDown="UIElement_OnMouseDown" 
+                                   ShowFrameRate="True" 
+                                   InfiniteSpin="true" 
+                                   IsHeadLightEnabled="True"
+                                   Background="Black"
+                                   InfoBackground="Transparent"
+                                   InfoForeground="GreenYellow"
+                                   CameraRotationMode="Trackball"
+                                   ShowCoordinateSystem="True"
+                                   CalculateCursorPosition="True"
+                                   CoordinateSystemLabelForeground="White"
+                                   CoordinateSystemLabelX="x"
+                                   CoordinateSystemLabelY="y"
+                                   CoordinateSystemLabelZ="z"
+                                   Title="3D Demo"
+                                   SubTitle="Refinery #3 Near 2 wells" 
+                                   TextBrush="GreenYellow">
+
+            <h:HelixViewport3D.DefaultCamera>
+                <PerspectiveCamera Position="-150 -150 115" LookDirection="150 150 -100" UpDirection="0 0 1"/>
+            </h:HelixViewport3D.DefaultCamera>
+            <h:SunLight/>
+            <h:GridLinesVisual3D/>
+
+            <ModelVisual3D x:Name="MainModel">
+                <visualModels:HouseVisual3D Name="House 1" />
+                <visualModels:HouseVisual3D Name="House 2" Transform="{h:Translate 40,0,0}"/>
+                <visualModels:HouseVisual3D Name="House 3" Transform="{h:Translate 0,20,0}"/>
+                <visualModels:HouseVisual3D Name="House 4" Transform="{h:Translate 40,20,0}"/>
+
+                <visualModels:SiloVisual3D Name="Silo 1" Transform="{h:Translate 0,100,0}"/>
+                <visualModels:SiloVisual3D Name="Silo 2" Transform="{h:Translate 50,100,0}"/>
+                <visualModels:SiloVisual3D Name="Silo 3" Transform="{h:Translate 0,150,0}"/>
+                <visualModels:SiloVisual3D Name="Silo 4" Transform="{h:Translate 50,150,0}"/>
+
+                <visualModels:SiloVisual3D Name="Silo 5" Transform="{h:Translate 100,125,0}" Height="40" Diameter="20" DomeDiameter="18" DomeHeight="3"/>
+                <visualModels:SiloVisual3D Name="Silo 6" Transform="{h:Translate 130,125,0}" Height="40" Diameter="20" DomeDiameter="18" DomeHeight="3"/>
+                <visualModels:SiloVisual3D Name="Silo 7" Transform="{h:Translate 160,125,0}" Height="40" Diameter="20" DomeDiameter="18" DomeHeight="3"/>
+
+                <visualModels:KerbVisual3D Transform="{h:Translate 130,125,0}" Width="0.2" Height="0.1" Positions="{extenssions:Superellipse 45,15,40}" Texture="{StaticResource KerbBrush}"/>
+
+                <visualModels:ChimneyVisual3D Name="Chimney 1" x:Name="chimney1" Position="100,0,0"/>
+                <visualModels:ChimneyVisual3D Name="Chimney 2" Position="120,0,0"/>
+
+                <visualModels:WellVisual3D Name="Well 1" Position="-50,0,0"/>
+                <visualModels:WellVisual3D Name="Well 2" Position="-75,0,0"/>
+
+                <visualModels:FenceVisual3D Name="Fence 1" Height="2" Transform="{h:Translate 110,0,0}" Positions="{extenssions:Superellipse 20,20,3}" PoleTexture="Silver" FenceTexture="{StaticResource FenceBrush}"/>
+                <visualModels:FenceVisual3D Name="Fence 2" Height="2" Positions="{StaticResource FencePositions}" PoleTexture="Silver" FenceTexture="{StaticResource FenceBrush}"/>
+            </ModelVisual3D>
+
+            <visualModels:SurfacePlotVisual3D 
+                Points="{Binding SurfacePlotViewModel.Data}" 
+                ColorValues="{Binding ColorValues}"
+                SurfaceBrush="{Binding SurfacePlotViewModel.SurfaceBrush}"/>
+
+            <h:BoundingBoxVisual3D BoundingBox="{Binding SizeableViewModel.SelectedObject, Converter={StaticResource BoundsConverter}}" Diameter="0.2"/>
+
+            <h:BindableTranslateManipulator Direction="1 0 0"  Length="5" Diameter="1" Color="Black" 
+                                             Value="{Binding SizeableViewModel.TranslateValue}"
+                                             TargetTransform="{Binding SizeableViewModel.SelectedObject}"/>
+
+            <h:BindableRotateManipulator Position="20 15 0"  Diameter="10" InnerDiameter="7" Axis="0 1 0" Color="Green"
+                                          Value="{Binding SizeableViewModel.RotateValue}"  
+                                          TargetTransform="{Binding SizeableViewModel.SelectedObject}"/>
+            <h:SphereVisual3D x:Name="sphere1" Radius="1" Fill="Gold" />
+            <h:ArrowVisual3D Origin="15 10 0"  Point1="15 10 0" Point2="19 10 0"   x:Name="cube1"  Fill="Gold"/>
+
+        </h:HelixViewport3D>
+
+        <StackPanel Grid.Row="1" Grid.Column="2">
+            <pt:PropertyGrid SelectedObject="{Binding  SizeableViewModel.SelectedObject}" Height="Auto" Width="Auto"
+                             TabVisibility="Visible" Margin="4" RequiredAttribute="{x:Type componentModel:BrowsableAttribute}"/>
+
+            <StackPanel>
+                <GroupBox Header="Move selected">
+                    <StackPanel>
+                        <TextBox Text="{Binding SizeableViewModel.TranslateValue, UpdateSourceTrigger=PropertyChanged}" MinWidth="70"/>
+                        <Slider Minimum="-20" Maximum="20" Value="{Binding SizeableViewModel.TranslateValue}" />
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="Rotate selected">
+                    <StackPanel>
+                        <TextBox Text="{Binding SizeableViewModel.RotateValue, UpdateSourceTrigger=PropertyChanged}" MinWidth="70"/>
+                        <Slider Minimum="0" Maximum="360" Value="{Binding SizeableViewModel.RotateValue}" />
+                    </StackPanel>
+                </GroupBox>
+
+            </StackPanel>
+        </StackPanel>
+        
+
+    </Grid>
+</UserControl>
